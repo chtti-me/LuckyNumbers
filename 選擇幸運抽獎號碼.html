@@ -1,0 +1,540 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>感恩餐會選號</title>
+
+  <style>
+    :root{
+      --blue-950:#061226;         /* 深邃藍（背景） */
+      --blue-900:#071a33;
+      --blue-800:#0a2550;
+      --blue-700:#0e2f66;
+      --text:#eaf1ff;
+
+      --gold-500:#d4af37;         /* 奢華金（主色） */
+      --gold-400:#e8c766;
+      --gold-300:#f2de9a;
+
+      --muted: rgba(234,241,255,.72);
+      --glass: rgba(255,255,255,.06);
+      --glass2: rgba(255,255,255,.10);
+      --line: rgba(212,175,55,.25);
+      --shadow: 0 16px 50px rgba(0,0,0,.45);
+    }
+
+    *{ box-sizing: border-box; }
+
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans TC", "PingFang TC", Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1200px 700px at 20% 10%, rgba(212,175,55,.22), transparent 55%),
+        radial-gradient(900px 600px at 90% 0%, rgba(82,155,255,.18), transparent 50%),
+        radial-gradient(900px 600px at 80% 90%, rgba(212,175,55,.12), transparent 55%),
+        linear-gradient(180deg, var(--blue-950), var(--blue-900));
+      padding: 28px 18px 60px;
+    }
+
+    .wrap{
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    .hero{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .title{
+      display:flex;
+      flex-direction:column;
+      gap: 6px;
+    }
+
+    h1{
+      font-size: 22px;
+      letter-spacing: .5px;
+      margin:0;
+    }
+
+    .subtitle{
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .card{
+      background: linear-gradient(180deg, var(--glass2), var(--glass));
+      border: 1px solid rgba(212,175,55,.22);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      padding: 16px;
+    }
+
+    .controls{
+      display:flex;
+      flex-wrap:wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .left, .right{
+      display:flex;
+      flex-wrap:wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    label{
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    input{
+      width: min(360px, 70vw);
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(212,175,55,.25);
+      background: rgba(6,18,38,.65);
+      color: var(--text);
+      outline: none;
+    }
+    input:focus{
+      border-color: rgba(212,175,55,.55);
+      box-shadow: 0 0 0 4px rgba(212,175,55,.12);
+    }
+
+    button{
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(212,175,55,.28);
+      background: rgba(10, 37, 80, .65);
+      color: var(--text);
+      cursor: pointer;
+      transition: transform .08s ease, background .15s ease, border-color .15s ease;
+      user-select:none;
+      white-space: nowrap;
+    }
+    button:hover{
+      background: rgba(14, 47, 102, .72);
+      border-color: rgba(212,175,55,.45);
+    }
+    button:active{
+      transform: translateY(1px);
+    }
+    .btn-gold{
+      background: linear-gradient(180deg, rgba(212,175,55,.95), rgba(212,175,55,.65));
+      color: #0b1733;
+      border-color: rgba(212,175,55,.70);
+      font-weight: 700;
+    }
+    .btn-gold:hover{
+      background: linear-gradient(180deg, rgba(232,199,102,.98), rgba(212,175,55,.70));
+    }
+    .btn-danger{
+      background: rgba(140, 30, 55, .35);
+      border-color: rgba(255, 120, 140, .35);
+    }
+    .btn-danger:hover{
+      background: rgba(140, 30, 55, .50);
+      border-color: rgba(255, 120, 140, .55);
+    }
+
+    .stats{
+      display:flex;
+      flex-wrap: wrap;
+      gap: 10px 14px;
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 13px;
+      align-items:center;
+    }
+    .pill{
+      display:inline-flex;
+      gap: 8px;
+      align-items:center;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(212,175,55,.22);
+      background: rgba(6,18,38,.45);
+    }
+    .dot{
+      width: 9px; height: 9px; border-radius: 999px;
+      display:inline-block;
+      background: rgba(255,255,255,.35);
+      border: 1px solid rgba(255,255,255,.18);
+    }
+    .dot-available{ background: rgba(70, 180, 255, .70); border-color: rgba(70,180,255,.25); }
+    .dot-taken{ background: rgba(255, 120, 140, .70); border-color: rgba(255,120,140,.25); }
+    .dot-mine{ background: rgba(212,175,55,.90); border-color: rgba(212,175,55,.35); }
+
+    .grid-wrap{
+      margin-top: 14px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fill, minmax(62px, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .num{
+      height: 50px;
+      border-radius: 14px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight: 700;
+      letter-spacing: .3px;
+      border: 1px solid rgba(212,175,55,.20);
+      background: rgba(6,18,38,.55);
+      color: var(--text);
+      cursor:pointer;
+      box-shadow: 0 8px 18px rgba(0,0,0,.25);
+      transition: transform .08s ease, border-color .15s ease, background .15s ease, opacity .15s ease;
+      user-select:none;
+      position: relative;
+      overflow: hidden;
+    }
+    .num::after{
+      content:"";
+      position:absolute;
+      inset: -40px -60px auto auto;
+      width: 120px;
+      height: 120px;
+      background: radial-gradient(circle at 30% 30%, rgba(212,175,55,.18), transparent 60%);
+      transform: rotate(25deg);
+    }
+    .num:hover{
+      transform: translateY(-1px);
+      border-color: rgba(212,175,55,.45);
+      background: rgba(10,37,80,.55);
+    }
+
+    /* 已被別人選走：玫瑰紅 */
+    .taken{
+      cursor:not-allowed;
+      opacity: .78;
+      border-color: rgba(255, 120, 140, .35);
+      background: rgba(90, 20, 40, .35);
+      color: rgba(234,241,255,.78);
+      box-shadow: none;
+    }
+    .taken:hover{ transform:none; }
+
+    /* 自己選到：奢華金 */
+    .mine{
+      border-color: rgba(212,175,55,.95);
+      background: linear-gradient(180deg, rgba(212,175,55,.92), rgba(212,175,55,.45));
+      color: #0b1733;
+      box-shadow: 0 12px 28px rgba(212,175,55,.18);
+      cursor: default;
+    }
+    .mine:hover{ transform:none; }
+
+    .hint{
+      margin-top: 10px;
+      font-size: 12px;
+      color: rgba(234,241,255,.68);
+      line-height: 1.6;
+      border-top: 1px dashed rgba(212,175,55,.22);
+      padding-top: 10px;
+    }
+
+    .log{
+      margin-top: 12px;
+      font-size: 16px;
+      /*color: var(--text);*/
+      color:yellow;
+      background: rgba(6,18,38,.35);
+      border: 1px solid rgba(212,175,55,.18);
+      border-radius: 12px;
+      padding: 10px 12px;
+      white-space: pre-wrap;
+      line-height: 1.55;
+    }
+
+    .footer{
+      margin-top: 14px;
+      color: rgba(234,241,255,.55);
+      font-size: 12px;
+      text-align: center;
+    }
+
+    .kbd{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      padding: 2px 6px;
+      border-radius: 8px;
+      border: 1px solid rgba(212,175,55,.18);
+      background: rgba(6,18,38,.55);
+      color: rgba(234,241,255,.85);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <div class="title">
+        <h1>感恩餐會抽獎選號</h1>
+        <div class="subtitle">選一個你喜歡的號碼；已被選走會即時更新。每位同仁同一時間只能保留一個號碼（可先放棄再重選）。</div>
+<div class="subtitle">如要查詢自己選過的號碼，請輸入自己的姓名即可。</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="controls">
+        <div class="left">
+          <label for="me">你的姓名：</label>
+          <input id="me" length="4" placeholder="例如：王小明" autocomplete="off" />
+        </div>
+        <div class="right">
+          <button id="randomBtn" class="btn-gold">隨機分配</button>
+          <button id="giveUpBtn" class="btn-danger">放棄目前號碼</button>
+          <button id="refreshBtn">重新載入</button>
+        </div>
+      </div>
+
+     <div class="log" id="log">尚未載入…</div>
+    </div>
+
+     <div class="hint">
+        小提示：<span class="kbd">紅色</span> 表示已被選走、<span class="kbd">金色</span> 表示你目前持有的號碼。
+        若你想換號碼，請先按 <span class="kbd">放棄目前號碼</span> 再重新選。
+      </div>
+
+      <div class="stats" id="stats">
+        <span class="pill"><span class="dot dot-available"></span>可選 <b id="availCount">0</b></span>
+        <span class="pill"><span class="dot dot-taken"></span>已選 <b id="takenCount">0</b></span>
+        <span class="pill"><span class="dot dot-mine"></span>我的號碼 <b id="myNumber">—</b></span>
+      </div>
+
+      <div class="grid-wrap">
+        <div class="grid" id="grid"></div>
+      </div>
+
+ 
+
+ 
+
+    
+  </div>
+
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+    // ✅ 1) 改成你的值
+    const SUPABASE_URL = "https://fcezhdqllyqaldvckwdm.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZjZXpoZHFsbHlxYWxkdmNrd2RtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwNTE0NzEsImV4cCI6MjA4MjYyNzQ3MX0.t7YFRV_FvRLTsiBHm_bhhzyarq8rum4vynvAr51Gb1s";
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const grid = document.getElementById('grid');
+    const logEl = document.getElementById('log');
+    const meEl = document.getElementById('me');
+    const randomBtn = document.getElementById('randomBtn');
+    const giveUpBtn = document.getElementById('giveUpBtn');
+    const refreshBtn = document.getElementById('refreshBtn');
+
+    const availCountEl = document.getElementById('availCount');
+    const takenCountEl = document.getElementById('takenCount');
+    const myNumberEl = document.getElementById('myNumber');
+
+    // number -> row
+    let state = new Map();
+
+    function log(msg) {
+      logEl.textContent = msg;
+    }
+
+    function getMe() {
+      return meEl.value.trim();
+    }
+
+    function computeMyNumber(me) {
+      if (!me) return null;
+      for (const [n, row] of state.entries()) {
+        if (row.picked_by === me) return n;
+      }
+      return null;
+    }
+
+    function render() {
+      const me = getMe();
+      const myNumber = computeMyNumber(me);
+
+      let available = 0, taken = 0;
+
+      // 清掉重畫（號碼不大時這樣最簡單）
+      grid.innerHTML = '';
+
+      const numbers = [...state.keys()].sort((a,b)=>a-b);
+      for (const n of numbers) {
+        const row = state.get(n);
+        const pickedBy = row?.picked_by ?? null;
+
+        if (pickedBy) taken++; else available++;
+
+        const isMine = me && pickedBy === me;
+        const isTaken = !!pickedBy && !isMine;
+
+        const div = document.createElement('div');
+        div.className = 'num' + (isTaken ? ' taken' : '') + (isMine ? ' mine' : '');
+        div.textContent = n;
+
+        if (isMine) {
+          div.title = `你目前持有：${n}`;
+          div.onclick = null;
+        } else if (isTaken) {
+          div.title = `已被選走：${pickedBy}`;
+          div.onclick = null;
+        } else {
+          div.title = '可選';
+          div.onclick = () => pickNumber(n);
+        }
+
+        grid.appendChild(div);
+      }
+
+      availCountEl.textContent = available;
+      takenCountEl.textContent = taken;
+      myNumberEl.textContent = myNumber ?? '—';
+    }
+
+    async function loadAll() {
+      const { data, error } = await supabase
+        .from('lucky_numbers')
+        .select('number,picked_by,picked_at')
+        .order('number', { ascending: true });
+
+      if (error) return log('載入失敗：' + error.message);
+
+      state = new Map(data.map(r => [r.number, r]));
+      render();
+      log(`已載入 ${data.length} 個號碼。`);
+    }
+
+    function friendlyPickError(error) {
+      // Postgres unique violation（通常是你已經選過別的號碼了）
+      if (error?.code === '23505') {
+        return '你已經選過一個號碼了。若要換號碼，請先按「放棄目前號碼」。';
+      }
+      return '操作失敗：' + (error?.message ?? '未知錯誤');
+    }
+
+    async function pickNumber(n) {
+      const me = getMe();
+      if (!me) return log('請先輸入你的姓名');
+
+      // 如果自己已經有號碼，先提示（避免多一次 DB round trip）
+      const myNumber = computeMyNumber(me);
+      if (myNumber != null) return log(`你目前已選到：${myNumber}。若要換號碼，請先按「放棄目前號碼」。`);
+
+      // ✅ 併發安全：只更新 picked_by is null 的那筆
+      const { data, error } = await supabase
+        .from('lucky_numbers')
+        .update({ picked_by: me, picked_at: new Date().toISOString() })
+        .eq('number', n)
+        .is('picked_by', null)
+        .select();
+
+      if (error) return log(friendlyPickError(error));
+      if (!data || data.length === 0) return log(`號碼 ${n} 已被選走，請換一個。`);
+
+      log(`🎉 你已選到號碼：${n}`);
+      // Realtime 會自動更新 state；這裡不需要手動改 state
+      await loadAll();
+
+    }
+
+    async function randomPick() {
+      const me = getMe();
+      if (!me) return log('請先輸入你的姓名');
+
+      const myNumber = computeMyNumber(me);
+      if (myNumber != null) return log(`你目前已選到：${myNumber}。若要換號碼，請先按「放棄目前號碼」。`);
+
+      // 先找還沒被選走的號碼
+      const { data: available, error } = await supabase
+        .from('lucky_numbers')
+        .select('number')
+        .is('picked_by', null);
+
+      if (error) return log('查詢可用號碼失敗：' + error.message);
+      if (!available.length) return log('已經沒有可用號碼了。');
+
+      // 隨機挑一個嘗試更新；若多人同時搶，可能會撞到 is null 條件失敗 → 重試
+      for (let i = 0; i < 12; i++) {
+        const pick = available[Math.floor(Math.random() * available.length)].number;
+
+        const { data, error } = await supabase
+          .from('lucky_numbers')
+          .update({ picked_by: me, picked_at: new Date().toISOString() })
+          .eq('number', pick)
+          .is('picked_by', null)
+          .select();
+
+        if (error) return log(friendlyPickError(error));
+        if (data && data.length) return log(`✨ 隨機分配給你：${pick}`);
+      }
+
+      log('隨機分配遇到多人同時搶號，請再按一次。');
+    }
+
+    async function giveUp() {
+      const me = getMe();
+      if (!me) return log('請先輸入你的姓名');
+
+      // 只放棄「picked_by = me」的那筆
+      const { data, error } = await supabase
+        .from('lucky_numbers')
+        .update({ picked_by: null, picked_at: null })
+        .eq('picked_by', me)
+        .select();
+
+      if (error) return log('放棄失敗：' + error.message);
+      if (!data || data.length === 0) return log('你目前沒有選到任何號碼。');
+
+      log(`已放棄號碼：${data[0].number}（現在可以重新選號）`);
+      await loadAll();
+    }
+
+    // ✅ Realtime：有人選到/放棄，立刻更新畫面
+    supabase
+      .channel('lucky_numbers_changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'lucky_numbers' },
+        (payload) => {
+          const row = payload.new ?? payload.old;
+          if (row?.number == null) return;
+
+          if (payload.eventType === 'DELETE') state.delete(row.number);
+          else state.set(row.number, payload.new);
+
+          render();
+        }
+      )
+      .subscribe();
+
+    randomBtn.onclick = randomPick;
+    giveUpBtn.onclick = giveUp;
+    refreshBtn.onclick = loadAll;
+
+    // 輸入識別變更時，立刻重新套用 mine 樣式/顯示我的號碼
+    meEl.addEventListener('input', () => render());
+
+    await loadAll();
+
+  </script>
+</body>
+</html>
