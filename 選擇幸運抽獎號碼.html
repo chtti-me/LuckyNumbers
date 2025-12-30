@@ -485,9 +485,11 @@
 
         if (error) return log(friendlyPickError(error));
         if (data && data.length) return log(`✨ 隨機分配給你：${pick}`);
+        await loadAll();
       }
 
       log('隨機分配遇到多人同時搶號，請再按一次。');
+      await loadAll();
     }
 
     async function giveUp() {
