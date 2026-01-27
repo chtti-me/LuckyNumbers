@@ -1,0 +1,47 @@
+此非原本用於114年年終感恩餐會在Thrisiser's GitHub帳號下的版本，
+此為使用chtti-me's GitHub帳號fork之後的版本。
+
+資料庫名稱：Lucky Number
+資料庫密碼：Pass@word@1234
+
+Project Settings ->Data API->API Settings->Project URL->URL - RESTful endpoint for querying and managing your database：
+https://tdvabujknqxeyhpilddl.supabase.co
+
+Project Settings ->API Keys->Legacy anon, service_role API keys：
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkdmFidWprbnF4ZXlocGlsZGRsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk0ODQ1NTIsImV4cCI6MjA4NTA2MDU1Mn0.czI4Is84uQnzNjnp4tnXVgHHHl4Ct1WPyBhvdsUJRYo
+
+
+0_從未使用過本工具，初次使用時必須先建立表格
+
+create table if not exists public.lucky_numbers (
+  number     integer primary key,   -- 抽獎號碼（1..N）
+  picked_by  text,                  -- 選號者（姓名）
+  picked_at  timestamptz            -- 選號時間
+);
+
+1_表格已存在，初始化建立號碼
+
+insert into public.lucky_numbers(number)
+select generate_series(1, 120)  --有幾個人參加摸彩，最大數字就設定幾個
+on conflict (number) do nothing;
+
+2_維持現有號碼數量，重新開始選號
+
+update public.lucky_numbers
+set picked_by = null,
+    picked_at = null;
+
+3_刪除表格後，重新設定號碼數量
+
+truncate table public.lucky_numbers;
+insert into public.lucky_numbers(number)
+select generate_series(1, 93);
+
+4_增加號碼上限
+
+/*增加號碼上限，例如從原本最多120個號碼，增加為200個號碼*/
+insert into public.lucky_numbers(number)
+select generate_series(121, 200)
+on conflict (number) do nothing;
+
+
